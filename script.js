@@ -48,7 +48,6 @@ let aud;
 let currentSongIndex = 0;
 let isPlaying = false;
 var data_streams = localStorage.getItem("data_streams") || 0;
-let recentSongs = [];
 async function playSong(songTitle) {
   const db = await openSongsDB();
   const transaction = db.transaction(["songs"], "readonly");
@@ -307,10 +306,7 @@ function getID3Data(songData, isUpload, fileName) {
         }
 
         let songTitle = document.getElementById("songTitle");
-        if (title === null) {
-          title = fileName;
-          localStorage.setItem("songTitle", title);
-        } else if (title === "") {
+        if (title === null || title === undefined || title === "") {
           title = fileName;
           localStorage.setItem("songTitle", title);
         } else {
@@ -318,10 +314,7 @@ function getID3Data(songData, isUpload, fileName) {
           localStorage.setItem("songTitle", title);
         }
         let songArtist = document.getElementById("songArtist");
-        if (artist === null) {
-          artist = "Unknown Artist";
-          localStorage.setItem("songArtist", artist);
-        } else if (artist === "") {
+        if (artist === null || artist === undefined || artist === "") {
           artist = "Unknown Artist";
           localStorage.setItem("songArtist", artist);
         } else {
@@ -330,10 +323,7 @@ function getID3Data(songData, isUpload, fileName) {
         }
 
         let songAlbum;
-        if (album === null) {
-          album = "Unknown Album";
-          localStorage.setItem("songAlbum", album);
-        } else if (album === "") {
+        if (album === null || album === undefined || album === "") {
           album = "Unknown Album";
           localStorage.setItem("songAlbum", album);
         } else {
@@ -355,6 +345,7 @@ function getID3Data(songData, isUpload, fileName) {
         }
       },
       onError: function(error) {
+        console.log(":(", error.type, error.info);
         let title = tag.tags.title ? tag.tags.title.replace(/'/g, '') : fileName.replace(/'/g, '');
         let artist = tag.tags.artist ? tag.tags.artist.replace(/'/g, '') : "";
         let album = tag.tags.album ? tag.tags.album.replace(/'/g, '') : "";
@@ -448,54 +439,6 @@ function raiseSidebar() {
   }
   progressBar();
   logCurrentTime();
-}
-
-// Listen for CTRL + Spacebar then do something
-document.addEventListener('keydown', function(event) {
-  if (event.ctrlKey && event.code == 'Space') {
-    console.log("CTRL + Spacebar pressed");
-  }
-});
-
-
-function createSongTiles() {
-  const openRequest = indexedDB.open("songs_db", 2);
-
-  openRequest.onsuccess = function(event) {
-    const db = event.target.result;
-    const transaction = db.transaction(["songs"], "readonly");
-    const objectStore = transaction.objectStore("songs");
-
-    objectStore.openCursor().onsuccess = function(event) {
-      const cursor = event.target.result;
-      if (cursor) {
-        const songName = cursor.value.name.replace("_", " ");
-        const songData = cursor.value.data;
-        const aud = new Audio(songData);
-        let title, artist, album, year, picture;
-        returnID3Data(songData).then(data => {
-          [title, artist, album, year, picture] = data;
-          console.log(title, artist, album, year, picture);
-          aud.addEventListener("loadedmetadata", function() {
-            const songDuration = formatTime(this.duration);
-            const songTile = `
-              <div class="song" onclick="playSong('${cursor.value.name}'); currentSongIndex = ${cursor.key};">
-                <div class="song-title">${title || 'Unknown Title'}</div>
-                <div class="song-duration">${songDuration}</div>
-                <div class="song-date">${year || 'Unknown Year'}</div>
-              </div>
-            `;
-            document.getElementById("song-tiles").innerHTML += songTile;
-          });
-        });
-        cursor.continue();
-      }
-    };
-  };
-
-  openRequest.onerror = function(event) {
-    console.error("IndexedDB error: ", event.target.errorCode);
-  };
 }
 
 
