@@ -22,6 +22,7 @@ function displayAllSongs(isMore) {
           const cursor = event.target.result;
           if (cursor) {
               allSongs.push(cursor.value);
+              console.log(allSongs);
               cursor.continue();
           } else {
               const showMoreSongs = function () {
