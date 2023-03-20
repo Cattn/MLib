@@ -60,10 +60,20 @@
       <button onclick="localStorage.setItem('autoNotiSend', 'on');">Enable Music Notifications</button>
     </div>
     <h1 class="subheading">Your Library</h1>
+    <div class="slider-container">
+      <label style="color: white;" for="song-count">Amount of Songs Displayed</label>
+      <span style="margin-left:1vw; margin-right: 0.3vw; color: white;">1</span>
+      <input type="range" id="song-count" min="1" max="300" value="50">
+      <div id="slider-labels">
+        <span style="color: white;">300</span>
+      </div>
+    </div>     
     <div id="songsDiv">
 
     </div>
     <h1 class="subheading">Albums</h1>
+    <p>Albums coming soon.... (Disabled due to performance issues)</p>
+    <br><br><br>
     <div id="albumsDiv">
 
     </div>

@@ -94,10 +94,8 @@ async function playSong(songTitle) {
   aud.addEventListener("ended", function() {
     if (currentSongIndex === songs.length - 1) {
       currentSongIndex = 0;
-      console.log(currentSongIndex);
     } else {
       currentSongIndex += 1;
-      console.log(currentSongIndex);
     }
     playSong(songs[currentSongIndex]);
   });
@@ -146,7 +144,6 @@ function goBack() {
   }
   // Decrement the index, wrapping around to the end of the array if necessary
   currentSongIndex = (currentSongIndex + songs.length - 1) % songs.length;
-  console.log(songs);
   playSong(songs[currentSongIndex]);
 }
 
@@ -156,7 +153,6 @@ function goForward() {
   }
   // Increment the index, wrapping around to the beginning of the array if necessary
   currentSongIndex = (currentSongIndex + 1) % songs.length;
-  console.log(songs);
   playSong(songs[currentSongIndex]);
 }
 
