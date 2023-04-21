@@ -213,103 +213,73 @@ function resizeGrid() {
     resizeColor.style.color = "var(--media-icon-color)";
   }
 }
-/*
+
 function showAlbums() {
-    const openRequest = indexedDB.open("songs_db", 2);
-    openRequest.onerror = (event) => {
-      console.log("Failed to open database");
-    };
-    openRequest.onsuccess = (event) => {
-      const db = event.target.result;
-      const transaction = db.transaction("songs", "readonly");
-      const objectStore = transaction.objectStore("songs");
-  
-      const request = objectStore.openKeyCursor();
-  
+  const openRequest = indexedDB.open("songs_db", 2);
+  openRequest.onerror = (event) => {
+    console.log("Failed to open database");
+  };
+  openRequest.onsuccess = (event) => {
+    const db = event.target.result;
+    const transaction = db.transaction("songs", "readonly");
+    const objectStore = transaction.objectStore("songs");
+    const request = objectStore.getAll();
+
+    request.onsuccess = (event) => {
+      const songs = event.target.result;
       const albumCounts = {};
-  
-      const albumArts = {};
-  
-      request.onsuccess = (event) => {
-        const cursor = event.target.result;
-        if (cursor) {
-          const songKey = cursor.key;
-          const songRequest = objectStore.get(songKey);
-          songRequest.onsuccess = (event) => {
-            const song = event.target.result;
-            const album = song.album;
-            if (album) {
-              if (albumCounts[album]) {
-                albumCounts[album]++;
-              } else {
-                albumCounts[album] = 1;
-                albumArts[album] = null;
-              }
-            }
-          };
-          cursor.continue();
-        } else {
-          const albums = Object.keys(albumCounts).filter(
-            (album) => albumCounts[album] > 1
-          );
-  
-          const albumList = document.getElementById("albumsDiv");
-          albumList.innerHTML = "";
-  
-          albums.forEach((album) => {
-            const albumDiv = document.createElement("div");
-            albumDiv.classList.add("album");
-  
-            const albumArt = document.createElement("img");
-            albumArt.classList.add("album-art");
-  
-            // Set album image if it hasn't been set before
-            const songRequest = objectStore.openKeyCursor();
-            songRequest.onsuccess = (event) => {
-              const cursor = event.target.result;
-              if (cursor) {
-                const songKey = cursor.key;
-                const songRequest = objectStore.get(songKey);
-                songRequest.onsuccess = (event) => {
-                  const song = event.target.result;
-                  const img = song.image;
-                  if (img) {
-                    albumArts[album] = img;
-                    albumArt.src = img;
-                  }
-                }
-              };
-            };
-  
-            albumArt.onclick = () => {
-              let baseUrl = location.href.replace(/\/index\.html$/, "");
-              let url = baseUrl + "/albuminfo.html?album=" + album;
-              const { parent } = xen;
-              parent.send("openNewWindow", "MLib Album View", url);
-              console.log("sender");
-            };
-  
-            const albumName = document.createElement("p");
-            albumName.classList.add("album-name");
-            albumName.textContent = album;
-  
-            albumDiv.appendChild(albumArt);
-            albumDiv.appendChild(albumName);
-  
-            albumList.appendChild(albumDiv);
-          });
+
+      songs.forEach((song) => {
+        const album = song.album;
+        if (album) {
+          if (albumCounts[album]) {
+            albumCounts[album]++;
+          } else {
+            albumCounts[album] = 1;
+          }
         }
-      };
-  
-      request.onerror = (event) => {
-        console.log("Failed to get songs");
-      };
+      });
+
+      const albums = Object.keys(albumCounts).filter(
+        (album) => albumCounts[album] > 1
+      );
+
+      const albumList = document.getElementById("albumsDiv");
+      albumList.innerHTML = "";
+
+      albums.forEach((album) => {
+        const albumDiv = document.createElement("div");
+        albumDiv.classList.add("album");
+
+        const albumArt = document.createElement("img");
+        albumArt.classList.add("album-art");
+        albumArt.src = songs.find((song) => song.album === album).image;
+        // Add onclick that will link to albuminfo.html with query of ?album=albumName
+        albumArt.onclick = () => {
+          let url = "albuminfo.html?album=" + album;
+          window.open(url, '_blank').focus();
+        };
+
+        const albumName = document.createElement("p");
+        albumName.classList.add("album-name");
+        albumName.textContent = album;
+
+        albumDiv.appendChild(albumArt);
+        albumDiv.appendChild(albumName);
+
+        albumList.appendChild(albumDiv);
+      });
     };
-  }
+
+    request.onerror = (event) => {
+      console.log("Failed to get songs");
+    };
+  };
+}
   
 
 showAlbums();
-*/
+
 function dataURItoBlob(dataURI) {
   // convert base64 to raw binary data held in a string
   // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
