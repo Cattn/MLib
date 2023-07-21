@@ -1,10 +1,11 @@
 {
   "name": "MLib",
-  "assets": ["manifest.json", "app.js", "index.html", "icon.png", "jsmediatags.min.js", "library.css", "quick.js", "script.js", "style.css", "theme.js", "themes.css", "default.jpg", "library.js", "albuminfo.html", "albuminfo.js"],
-  "entry": "app.js",
-  "type": "app",
-  "repository": "none",
-  "permissions": ["apps"],
+  "type": "auto",
+  "package": "cattn.mlib",
+  "index": "index.html",
   "icon": "icon.png",
-  "version": "0.3"
+  "wininfo":{
+      "title":"MLib",
+      "allowMultipleInstance": "true"
+  }
 }
